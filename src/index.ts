@@ -43,6 +43,8 @@ export class Mgine {
         if (options?.fillAvailableSpace) {
             canvas.style.width = '100%';
             canvas.style.height = '100%';
+            canvas.width = canvas.parentElement?.clientWidth || canvas.offsetWidth;
+            canvas.height = canvas.parentElement?.clientHeight || canvas.offsetHeight;
         } else {
             if (options?.width) {
                 canvas.width = options.width;
