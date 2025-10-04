@@ -39,7 +39,7 @@
   "bugs": {
     "url": "https://github.com/matronator/mgine/issues"
   },
-  "description": "2D canvas/WebGL rendering library.",
+  "description": "2D canvas rendering library.",
   "files": [
     "dist",
     "README.md",
@@ -61,9 +61,9 @@
   "homepage": "https://github.com/matronator/mgine#readme",
   "keywords": [
     "canvas",
-    "webgl",
-    "webgl2",
-    "2d"
+    "2d",
+    "graphics",
+    "rendering"
   ],
   "license": "MIT",
   "private": false,
@@ -80,11 +80,6 @@
     }
   },
   "typings": "./dist/mgine.d.ts",
-  "jest": {
-    "setupFiles": [
-      "jest-canvas-mock"
-    ]
-  },
   "devDependencies": {
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20.11.5",
