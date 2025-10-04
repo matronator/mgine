@@ -1,0 +1,105 @@
+{
+  "name": "mgine",
+  "version": "0.1.0",
+  "author": {
+    "name": "Matronator",
+    "email": "info@matronator.cz",
+    "url": "https://matronator.cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matronator/mgine.git"
+  },
+  "main": "./dist/mgine.cjs",
+  "module": "./dist/mgine.esm.js",
+  "jsdelivr": "./dist/mgine.iife.js",
+  "exports": {
+    ".": {
+      "require": "./dist/mgine.cjs",
+      "import": "./dist/mgine.esm.js",
+      "types": "./dist/mgine.d.ts"
+    },
+    "./dist/": {
+      "import": "./dist/",
+      "require": "./dist/",
+      "types": "./dist/"
+    }
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "prebuild": "rm -rf dist/*",
+    "build": "tsc && vite build",
+    "postbuild": "dts-bundle-generator --config ./dts-bundle-generator.config.ts",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "format": "prettier . --write",
+    "upgrade": "upgradeps",
+    "release": "npm run build && np"
+  },
+  "bugs": {
+    "url": "https://github.com/matronator/mgine/issues"
+  },
+  "description": "2D canvas/WebGL rendering library.",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE.md",
+    "CHANGELOG.md",
+    "src",
+    "package.json"
+  ],
+  "funding": [
+    {
+      "type": "individual",
+      "url": "https://revolut.me/matronator"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/matronator"
+    }
+  ],
+  "homepage": "https://github.com/matronator/mgine#readme",
+  "keywords": [
+    "canvas",
+    "webgl",
+    "webgl2",
+    "2d"
+  ],
+  "license": "MIT",
+  "private": false,
+  "sponsor": {
+    "url": "https://github.com/sponsors/matronator"
+  },
+  "type": "module",
+  "types": "./dist/mgine.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/mgine.d.ts"
+      ]
+    }
+  },
+  "typings": "./dist/mgine.d.ts",
+  "jest": {
+    "setupFiles": [
+      "jest-canvas-mock"
+    ]
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.6",
+    "@types/node": "^20.11.5",
+    "@vitest/coverage-v8": "^1.2.1",
+    "dts-bundle-generator": "^9.2.4",
+    "jsdom": "^24.1.0",
+    "lint-staged": "^15.2.0",
+    "np": "^10.0.6",
+    "prettier": "^3.2.4",
+    "terser": "^5.31.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "upgradeps": "^2.0.6",
+    "vite": "^5.0.12",
+    "vitest": "^1.2.1",
+    "vitest-canvas-mock": "^0.3.3"
+  }
+}
