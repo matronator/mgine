@@ -137,9 +137,9 @@ export class Mgine {
         const img = new Image();
         img.src = src;
 
-        let newCoords = coordinates !== 'center' ? coordinates : { x: (this.#canvas.width - img.width) / 2, y: (this.#canvas.height - img.height) / 2 };
-
         img.addEventListener('load', () => {
+            let newCoords = coordinates !== 'center' ? coordinates : { x: (this.#canvas.width - img.width) / 2, y: (this.#canvas.height - img.height) / 2 };
+
             if (sizeOrScale) {
                 if ('width' in sizeOrScale && 'height' in sizeOrScale) {
                     newCoords = coordinates === 'center' ? { x: (this.#canvas.width - sizeOrScale.width) / 2, y: (this.#canvas.height - sizeOrScale.height) / 2 } : newCoords;
