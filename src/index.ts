@@ -8,6 +8,11 @@ export interface Size {
     height: number;
 }
 
+export interface Scale {
+    x: number;
+    y: number;
+}
+
 export interface MgineOptions {
     pixelArt?: boolean;
     fillAvailableSpace?: boolean;
@@ -126,16 +131,31 @@ export class Mgine {
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
-    drawImage(src: string, coordinates: Point, size?: Size) {
+    drawImage(src: string, coordinates: Point|'center', scale?: Scale): void;
+    drawImage(src: string, coordinates: Point|'center', size?: Size): void;
+    drawImage(src: string, coordinates: Point|'center', sizeOrScale?: Size|Scale): void {
         const img = new Image();
         img.src = src;
 
+        let newCoords = coordinates !== 'center' ? coordinates : { x: (this.#canvas.width - img.width) / 2, y: (this.#canvas.height - img.height) / 2 };
+
         img.addEventListener('load', () => {
-            if (size) {
-                this.#ctx.drawImage(img, coordinates.x, coordinates.y, size.width, size.height);
-                return;
+            if (sizeOrScale) {
+                if ('width' in sizeOrScale && 'height' in sizeOrScale) {
+                    newCoords = coordinates === 'center' ? { x: (this.#canvas.width - sizeOrScale.width) / 2, y: (this.#canvas.height - sizeOrScale.height) / 2 } : newCoords;
+                    this.#ctx.drawImage(img, newCoords.x, newCoords.y, sizeOrScale.width, sizeOrScale.height);
+                    return;
+                }
+                if ('x' in sizeOrScale && 'y' in sizeOrScale) {
+                    const width = img.width * sizeOrScale.x;
+                    const height = img.height * sizeOrScale.y;
+                    newCoords = coordinates === 'center' ? { x: (this.#canvas.width - width) / 2, y: (this.#canvas.height - height) / 2 } : newCoords;
+                    this.#ctx.drawImage(img, newCoords.x, newCoords.y, width, height);
+                    return;
+                }
             }
-            this.#ctx.drawImage(img, coordinates.x, coordinates.y);
+
+            this.#ctx.drawImage(img, newCoords.x, newCoords.y);
         });
     }
 }
