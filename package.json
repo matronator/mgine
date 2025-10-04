@@ -34,7 +34,8 @@
     "test:coverage": "vitest --coverage",
     "format": "prettier . --write",
     "upgrade": "upgradeps",
-    "release": "npm run build && np"
+    "release": "npm run build && np",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "bugs": {
     "url": "https://github.com/matronator/mgine/issues"
@@ -84,6 +85,7 @@
     "@types/jsdom": "^21.1.6",
     "@types/node": "^20.11.5",
     "@vitest/coverage-v8": "^1.2.1",
+    "auto-changelog": "^2.5.0",
     "dts-bundle-generator": "^9.2.4",
     "jsdom": "^24.1.0",
     "lint-staged": "^15.2.0",

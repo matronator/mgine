@@ -8,17 +8,24 @@ export interface Size {
     height: number;
 }
 
+export interface MgineOptions {
+    pixelArt?: boolean;
+    fillAvailableSpace?: boolean;
+    width?: number;
+    height?: number;
+}
+
 export class Mgine {
     #canvas: HTMLCanvasElement;
     #ctx: CanvasRenderingContext2D;
 
-    constructor(id: string) {
-        const { canvas, ctx } = this.#init(id);
+    constructor(id: string, options?: MgineOptions) {
+        const { canvas, ctx } = this.#init(id, options);
         this.#canvas = canvas;
         this.#ctx = ctx;
     }
 
-    #init(id: string): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
+    #init(id: string, options?: MgineOptions): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
         const canvas = document.getElementById(id);
         if (!canvas) {
             throw new Error(`Canvas with id "${id}" not found`);
@@ -26,6 +33,21 @@ export class Mgine {
 
         if (canvas instanceof HTMLCanvasElement === false) {
             throw new Error(`Element with id "${id}" is not a canvas`);
+        }
+
+        if (options?.fillAvailableSpace) {
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+        } else {
+            if (options?.width) {
+                canvas.width = options.width;
+            }
+            if (options?.height) {
+                canvas.height = options.height;
+            }
+        }
+        if (options?.pixelArt) {
+            canvas.style.imageRendering = 'pixelated';
         }
 
         const ctx = canvas.getContext('2d');
@@ -36,8 +58,8 @@ export class Mgine {
         return { canvas, ctx };
     }
 
-    static Init(id: string) {
-        return new Mgine(id);
+    static Init(id: string, options?: MgineOptions): Mgine {
+        return new Mgine(id, options);
     }
 
     get canvas(): HTMLCanvasElement {
