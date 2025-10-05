@@ -43,8 +43,8 @@ export class Mgine {
         if (options?.fillAvailableSpace) {
             canvas.style.width = '100%';
             canvas.style.height = '100%';
-            canvas.width = canvas.parentElement?.clientWidth || canvas.offsetWidth;
-            canvas.height = canvas.parentElement?.clientHeight || canvas.offsetHeight;
+            canvas.width = canvas.parentElement?.clientWidth ?? window.innerWidth;
+            canvas.height = canvas.parentElement?.clientHeight ?? window.innerHeight;
         } else {
             if (options?.width) {
                 canvas.width = options.width;
@@ -159,5 +159,27 @@ export class Mgine {
 
             this.#ctx.drawImage(img, newCoords.x, newCoords.y);
         });
+    }
+
+    fillText(text: string, coordinates: Point, font: string, color: string, textAlign: CanvasTextAlign = 'start', textBaseline: CanvasTextBaseline = 'alphabetic', maxWidth?: number) {
+        this.#ctx.font = font;
+        this.#ctx.fillStyle = color;
+        this.#ctx.textAlign = textAlign;
+        this.#ctx.textBaseline = textBaseline;
+        this.#ctx.fillText(text, coordinates.x, coordinates.y, maxWidth);
+    }
+
+    strokeText(text: string, coordinates: Point, font: string, color: string, lineWidth: number = 1, textAlign: CanvasTextAlign = 'start', textBaseline: CanvasTextBaseline = 'alphabetic', maxWidth?: number) {
+        this.#ctx.font = font;
+        this.#ctx.strokeStyle = color;
+        this.#ctx.lineWidth = lineWidth;
+        this.#ctx.textAlign = textAlign;
+        this.#ctx.textBaseline = textBaseline;
+        this.#ctx.strokeText(text, coordinates.x, coordinates.y, maxWidth);
+    }
+
+    measureText(text: string, font: string): TextMetrics {
+        this.#ctx.font = font;
+        return this.#ctx.measureText(text);
     }
 }
