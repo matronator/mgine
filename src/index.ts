@@ -182,4 +182,18 @@ export class Mgine {
         this.#ctx.font = font;
         return this.#ctx.measureText(text);
     }
+
+    progressBar(coordinates: Point, size: Size, progress: number, backgroundColor: string = 'lightgray', progressColor: string = 'green', borderColor?: string, borderWidth: number = 1) {
+        // Draw background
+        this.fillRect(coordinates, size, backgroundColor);
+
+        // Draw progress
+        const progressWidth = Math.max(0, Math.min(1, progress)) * size.width;
+        this.fillRect(coordinates, { width: progressWidth, height: size.height }, progressColor);
+
+        // Draw border if specified
+        if (borderColor) {
+            this.strokeRect(coordinates, size, borderColor, borderWidth);
+        }
+    }
 }
