@@ -24,6 +24,6 @@
         "declarationDir": "dist",
         "listEmittedFiles": true
     },
-    "include": ["src", "dist/index.d.ts"],
+    "include": ["src", "dist/index.d.ts", "dist/mgine.d.ts"],
     "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**"]
 }

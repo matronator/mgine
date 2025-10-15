@@ -89,7 +89,7 @@
     "dts-bundle-generator": "^9.2.4",
     "jsdom": "^24.1.0",
     "lint-staged": "^15.2.0",
-    "np": "^10.0.6",
+    "np": "^10.2.0",
     "prettier": "^3.2.4",
     "terser": "^5.31.1",
     "ts-node": "^10.9.2",
