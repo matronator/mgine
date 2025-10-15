@@ -45,14 +45,6 @@ export class Mgine {
         this.#ctx = ctx;
     }
 
-    get canvas(): HTMLCanvasElement {
-        return this.#canvas;
-    }
-
-    get ctx(): CanvasRenderingContext2D {
-        return this.#ctx;
-    }
-
     #init(id: string, options?: MgineOptions): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
         const canvas = document.getElementById(id);
         if (!canvas) {
@@ -106,6 +98,14 @@ export class Mgine {
 
     static PreloadImages(sources: string[]): Promise<HTMLImageElement[]> {
         return Promise.all(sources.map(src => Mgine.PreloadImage(src)));
+    }
+
+    get canvas(): HTMLCanvasElement {
+        return this.#canvas;
+    }
+
+    get ctx(): CanvasRenderingContext2D {
+        return this.#ctx;
     }
 
     fillRect(coordinates: Point, size: Size, color: string) {
