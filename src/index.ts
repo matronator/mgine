@@ -26,6 +26,14 @@ export interface TextStyle {
     wordSpacing?: string;
 }
 
+export interface LineStyle {
+    width: number;
+    cap?: CanvasLineCap;
+    join?: CanvasLineJoin;
+}
+
+export const DefaultLineStyle: LineStyle = { width: 1, cap: 'butt', join: 'miter' };
+
 export interface ColorStop {
     color: string;
     offset: number;
@@ -117,6 +125,12 @@ export class Mgine {
         return this.#ctx;
     }
 
+    setLineStyle(lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.lineWidth = lineStyle.width;
+        this.#ctx.lineCap = lineStyle.cap ?? 'butt';
+        this.#ctx.lineJoin = lineStyle.join ?? 'miter';
+    }
+
     clear() {
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
@@ -150,9 +164,9 @@ export class Mgine {
         this.#ctx.fillRect(coordinates.x, coordinates.y, size.width, size.height);
     }
 
-    strokeRect(coordinates: Point, size: Size, color: Color, lineWidth: number = 1) {
+    strokeRect(coordinates: Point, size: Size, color: Color, lineStyle: LineStyle = DefaultLineStyle) {
         this.#ctx.strokeStyle = color;
-        this.#ctx.lineWidth = lineWidth;
+        this.setLineStyle(lineStyle);
         this.#ctx.strokeRect(coordinates.x, coordinates.y, size.width, size.height);
     }
 
@@ -160,11 +174,11 @@ export class Mgine {
         this.#ctx.clearRect(coordinates.x, coordinates.y, size.width, size.height);
     }
 
-    strokePath(points: Point[], color: Color, lineWidth: number = 1, closePath: boolean = false) {
+    strokePath(points: Point[], color: Color, lineStyle: LineStyle = DefaultLineStyle, closePath: boolean = false) {
         if (points.length === 0) return;
 
         this.#ctx.strokeStyle = color;
-        this.#ctx.lineWidth = lineWidth;
+        this.setLineStyle(lineStyle);
         this.#ctx.beginPath();
         this.#ctx.moveTo(points[0].x, points[0].y);
 
@@ -204,9 +218,9 @@ export class Mgine {
         this.#ctx.fill();
     }
 
-    strokeCircle(center: Point, radius: number, color: Color, lineWidth: number = 1) {
+    strokeCircle(center: Point, radius: number, color: Color, lineStyle: LineStyle = DefaultLineStyle) {
         this.#ctx.strokeStyle = color;
-        this.#ctx.lineWidth = lineWidth;
+        this.setLineStyle(lineStyle);
         this.#ctx.beginPath();
         this.#ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
         this.#ctx.stroke();
@@ -222,7 +236,7 @@ export class Mgine {
 
         // Draw border if specified
         if (borderColor) {
-            this.strokeRect(coordinates, size, borderColor, borderWidth);
+            this.strokeRect(coordinates, size, borderColor, { width: borderWidth });
         }
 
         // Draw progress number if specified
@@ -241,7 +255,7 @@ export class Mgine {
 
     circularProgressBar(center: Point, radius: number, progress: number, showText: boolean = false, thickness: number = 10, backgroundColor: string = 'lightgray', progressColor: string = 'green', textColor: string = 'black', maxFontSize: number = 36, lineCap: CanvasLineCap = 'round', startAngle: number = -Math.PI / 2) {
         // Draw background circle
-        this.strokeCircle(center, radius, backgroundColor, thickness);
+        this.strokeCircle(center, radius, backgroundColor, { width: thickness });
 
         // Draw progress arc
         const endAngle = startAngle + Math.max(0, Math.min(1, progress)) * Math.PI * 2;
@@ -302,8 +316,8 @@ export class Mgine {
         this.#ctx.fillText(text, coordinates.x, coordinates.y, maxWidth);
     }
 
-    strokeText(text: string, coordinates: Point, style: TextStyle, lineWidth: number = 1, maxWidth?: number) {
-        this.#ctx.lineWidth = lineWidth;
+    strokeText(text: string, coordinates: Point, style: TextStyle, lineStyle: LineStyle = DefaultLineStyle, maxWidth?: number) {
+        this.setLineStyle(lineStyle);
 
         this.#ctx.font = style.font;
         this.#ctx.strokeStyle = style.color ?? 'black';
