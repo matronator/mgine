@@ -26,6 +26,15 @@ export interface TextStyle {
     wordSpacing?: string;
 }
 
+export interface ColorStop {
+    color: string;
+    offset: number;
+}
+
+export type Color = string|CanvasGradient|CanvasPattern;
+
+export type Repetition = 'repeat'|'repeat-x'|'repeat-y'|'no-repeat';
+
 export interface MgineOptions {
     pixelArt?: boolean;
     fillAvailableSpace?: boolean;
@@ -108,12 +117,40 @@ export class Mgine {
         return this.#ctx;
     }
 
-    fillRect(coordinates: Point, size: Size, color: string) {
+    clear() {
+        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+    }
+
+    save() {
+        this.#ctx.save();
+    }
+
+    restore() {
+        this.#ctx.restore();
+    }
+
+    linearGradient(from: Point, to: Point, colorStops: ColorStop[]): CanvasGradient {
+        const gradient = this.#ctx.createLinearGradient(from.x, from.y, to.x, to.y);
+        colorStops.forEach(stop => gradient.addColorStop(stop.offset, stop.color));
+        return gradient;
+    }
+
+    radialGradient(from: Point, fromRadius: number, to: Point, toRadius: number, colorStops: ColorStop[]): CanvasGradient {
+        const gradient = this.#ctx.createRadialGradient(from.x, from.y, fromRadius, to.x, to.y, toRadius);
+        colorStops.forEach(stop => gradient.addColorStop(stop.offset, stop.color));
+        return gradient;
+    }
+
+    pattern(image: HTMLImageElement, repetition: Repetition = 'repeat'): CanvasPattern|null {
+        return this.#ctx.createPattern(image, repetition);
+    }
+
+    fillRect(coordinates: Point, size: Size, color: Color) {
         this.#ctx.fillStyle = color;
         this.#ctx.fillRect(coordinates.x, coordinates.y, size.width, size.height);
     }
 
-    strokeRect(coordinates: Point, size: Size, color: string, lineWidth: number = 1) {
+    strokeRect(coordinates: Point, size: Size, color: Color, lineWidth: number = 1) {
         this.#ctx.strokeStyle = color;
         this.#ctx.lineWidth = lineWidth;
         this.#ctx.strokeRect(coordinates.x, coordinates.y, size.width, size.height);
@@ -123,7 +160,7 @@ export class Mgine {
         this.#ctx.clearRect(coordinates.x, coordinates.y, size.width, size.height);
     }
 
-    strokePath(points: Point[], color: string, lineWidth: number = 1, closePath: boolean = false) {
+    strokePath(points: Point[], color: Color, lineWidth: number = 1, closePath: boolean = false) {
         if (points.length === 0) return;
 
         this.#ctx.strokeStyle = color;
@@ -142,7 +179,7 @@ export class Mgine {
         this.#ctx.stroke();
     }
 
-    fillPath(points: Point[], color: string, closePath: boolean = false) {
+    fillPath(points: Point[], color: Color, closePath: boolean = false) {
         if (points.length === 0) return;
 
         this.#ctx.fillStyle = color;
@@ -160,14 +197,14 @@ export class Mgine {
         this.#ctx.fill();
     }
 
-    fillCircle(center: Point, radius: number, color: string) {
+    fillCircle(center: Point, radius: number, color: Color) {
         this.#ctx.fillStyle = color;
         this.#ctx.beginPath();
         this.#ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
         this.#ctx.fill();
     }
 
-    strokeCircle(center: Point, radius: number, color: string, lineWidth: number = 1) {
+    strokeCircle(center: Point, radius: number, color: Color, lineWidth: number = 1) {
         this.#ctx.strokeStyle = color;
         this.#ctx.lineWidth = lineWidth;
         this.#ctx.beginPath();
@@ -202,7 +239,7 @@ export class Mgine {
         }
     }
 
-    circularProgressBar(center: Point, radius: number, progress: number, showText: boolean = false, thickness: number = 10, backgroundColor: string = 'lightgray', progressColor: string = 'green', textColor: string = 'black', startAngle: number = -Math.PI / 2) {
+    circularProgressBar(center: Point, radius: number, progress: number, showText: boolean = false, thickness: number = 10, backgroundColor: string = 'lightgray', progressColor: string = 'green', textColor: string = 'black', maxFontSize: number = 36, lineCap: CanvasLineCap = 'round', startAngle: number = -Math.PI / 2) {
         // Draw background circle
         this.strokeCircle(center, radius, backgroundColor, thickness);
 
@@ -210,7 +247,7 @@ export class Mgine {
         const endAngle = startAngle + Math.max(0, Math.min(1, progress)) * Math.PI * 2;
         this.#ctx.strokeStyle = progressColor;
         this.#ctx.lineWidth = thickness;
-        this.#ctx.lineCap = 'round';
+        this.#ctx.lineCap = lineCap;
         this.#ctx.beginPath();
         this.#ctx.arc(center.x, center.y, radius, startAngle, endAngle);
         this.#ctx.stroke();
@@ -219,7 +256,7 @@ export class Mgine {
         if (showText) {
             const percentage = Math.round(Math.max(0, Math.min(1, progress)) * 100);
             const text = `${percentage}%`;
-            const fontSize = Math.min(radius * 0.8, 36); // Limit font size to 36px for readability
+            const fontSize = Math.min(radius * 0.8, maxFontSize); // Limit font size to 36px for readability
             const font = `${fontSize}px ${Mgine.DefaultFontFamily}`;
             const textMetrics = this.measureText(text, font);
             const textX = center.x - textMetrics.width / 2;
@@ -227,10 +264,6 @@ export class Mgine {
 
             this.fillText(text, { x: textX, y: textY }, { font, color: textColor } );
         }
-    }
-
-    clear() {
-        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 
     drawImage(img: HTMLImageElement, coordinates: Point|'center', scale?: Scale): void;
