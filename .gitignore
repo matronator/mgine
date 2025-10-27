@@ -27,3 +27,13 @@ coverage
 *.sw?
 
 template.md
+
+test-coverage
+/test-results.json
+/test-results.html
+/html.meta.json.gz
+/favicon.ico
+/html
+/data
+/assets
+/bg.png

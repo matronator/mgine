@@ -10,19 +10,20 @@
     "type": "git",
     "url": "git+https://github.com/matronator/mgine.git"
   },
+  "types": "./dist/mgine.d.ts",
   "main": "./dist/mgine.cjs",
   "module": "./dist/mgine.esm.js",
   "jsdelivr": "./dist/mgine.iife.js",
   "exports": {
     ".": {
-      "require": "./dist/mgine.cjs",
       "import": "./dist/mgine.esm.js",
-      "types": "./dist/mgine.d.ts"
+      "types": "./dist/mgine.d.ts",
+      "require": "./dist/mgine.cjs"
     },
     "./dist/": {
       "import": "./dist/",
-      "require": "./dist/",
-      "types": "./dist/"
+      "types": "./dist/",
+      "require": "./dist/"
     }
   },
   "scripts": {
@@ -35,7 +36,8 @@
     "format": "prettier . --write",
     "upgrade": "upgradeps",
     "release": "npm run build && np",
-    "version": "auto-changelog -p && git add CHANGELOG.md"
+    "version": "auto-changelog -p && git add CHANGELOG.md",
+    "test:browser": "vitest --config=vitest.browser.config.ts"
   },
   "bugs": {
     "url": "https://github.com/matronator/mgine/issues"
@@ -47,7 +49,8 @@
     "LICENSE.md",
     "CHANGELOG.md",
     "src",
-    "package.json"
+    "package.json",
+    "tsconfig.json"
   ],
   "funding": [
     {
@@ -57,6 +60,10 @@
     {
       "type": "github",
       "url": "https://github.com/sponsors/matronator"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/matronator"
     }
   ],
   "homepage": "https://github.com/matronator/mgine#readme",
@@ -72,7 +79,6 @@
     "url": "https://github.com/sponsors/matronator"
   },
   "type": "module",
-  "types": "./dist/mgine.d.ts",
   "typesVersions": {
     "*": {
       "*": [
@@ -82,21 +88,41 @@
   },
   "typings": "./dist/mgine.d.ts",
   "devDependencies": {
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.19.21",
-    "@vitest/coverage-v8": "^1.6.1",
+    "@testing-library/dom": "^10.4.1",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^24.9.1",
+    "@vitest/browser": "^4.0.3",
+    "@vitest/browser-playwright": "^4.0.3",
+    "@vitest/coverage-v8": "^4.0.3",
+    "@vitest/ui": "4.0.3",
     "auto-changelog": "^2.5.0",
     "dts-bundle-generator": "^9.5.1",
-    "jsdom": "^24.1.3",
-    "lint-staged": "^15.5.2",
+    "jsdom": "^27.0.1",
+    "lint-staged": "^16.2.6",
     "np": "^10.2.0",
+    "playwright": "^1.56.1",
     "prettier": "^3.6.2",
     "terser": "^5.44.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "upgradeps": "^2.0.9",
-    "vite": "^5.4.20",
-    "vitest": "^1.6.1",
+    "vite": "^7.1.12",
+    "vitest": "^4.0.3",
     "vitest-canvas-mock": "^0.3.3"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "tabWidth": 4,
+    "singleQuote": false,
+    "trailingComma": "es5",
+    "arrowParens": "avoid",
+    "bracketSpacing": true,
+    "useTabs": false,
+    "endOfLine": "auto",
+    "singleAttributePerLine": false,
+    "bracketSameLine": false,
+    "jsxSingleQuote": false,
+    "quoteProps": "as-needed",
+    "semi": true
   }
 }

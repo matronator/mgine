@@ -1,12 +1,19 @@
-import { assert, describe, it } from 'vitest';
-import { Mgine } from '../src/index';
+import { assert, describe, it, vi } from 'vitest';
+import Mgine from '../../src/index';
+
+global.jest = vi;
 
 describe("construct", () => {
-    it("should construct without errors", () => {
+    function initMgine(): Mgine {
         const canvas = document.createElement('canvas');
         canvas.id = 'test-canvas';
         document.body.appendChild(canvas);
         const mgine = new Mgine('test-canvas');
+        return mgine;
+    }
+
+    it("should construct without errors", () => {
+        const mgine = initMgine();
         assert.instanceOf(mgine, Mgine);
     });
 
@@ -39,20 +46,4 @@ describe("construct", () => {
         assert.instanceOf(mgine.canvas, HTMLCanvasElement);
         assert.instanceOf(mgine.ctx, CanvasRenderingContext2D);
     });
-
-    // it("should fill rectangle correctly", () => {
-    //     const canvas = document.createElement('canvas');
-    //     canvas.height = 100;
-    //     canvas.width = 100;
-    //     canvas.id = 'test-canvas-3';
-    //     document.body.appendChild(canvas);
-    //     const mgine = new Mgine('test-canvas-3');
-    //     mgine.fillRect({ x: 0, y: 0 }, { width: 50, height: 50 }, 'rgba(255, 0, 0, 1)');
-    //     const imageData = mgine.ctx.getImageData(11, 11, 1, 1).data;
-    //     console.log(imageData);
-    //     assert.strictEqual(imageData[0], 255); // Red
-    //     assert.strictEqual(imageData[1], 0);   // Green
-    //     assert.strictEqual(imageData[2], 0);   // Blue
-    //     assert.strictEqual(imageData[3], 255); // Alpha
-    // });
 });

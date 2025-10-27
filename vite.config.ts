@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import path from 'path';
 import { defineConfig } from 'vite';
 import packageJson from './package.json';
@@ -38,28 +37,6 @@ export default defineConfig({
             keep_classnames: true,
             keep_fnames: true,
         }
-    },
-    test: {
-        globals: true,
-        environment: "jsdom",
-        setupFiles: ['./vitest.setup.ts'],
-        deps: {
-            optimizer: {
-                web: {
-                    include: ['vitest-canvas-mock']
-                }
-            }
-        },
-        poolOptions: {
-            threads: {
-                singleThread: true,
-            },
-        },
-        environmentOptions: {
-            jsdom: {
-                resources: 'usable',
-            },
-        },
     },
     resolve: {
         alias: [

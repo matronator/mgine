@@ -27,8 +27,11 @@ bun i mgine
 ## Usage
 
 ```js
-import { Mgine } from 'mgine';
+import Mgine from 'mgine';
 
-const mgine = Mgine.Init('canvas-id');
+const mgine = Mgine.Init('canvas-id', { /* options */ });
+// or
+const mgine2 = new Mgine('canvas-id', { /* options */ });
+
 mgine.fillRect({ x: 10, y: 10 }, { width: 50, height: 50 }, 'green');
 ```
