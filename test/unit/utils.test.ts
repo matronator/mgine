@@ -27,4 +27,13 @@ describe('deepClone', () => {
         expect(arr[1]).toBe(2);
         expect(cloned[1]).toBe(3);
     });
+
+    test('object with functions', () => {
+        const obj = { a: () => 1, b: { c: () => 2 } };
+        const cloned = deepClone(obj);
+        expect(cloned).not.toBe(obj);
+        expect(cloned).toEqual(obj);
+        expect(cloned.a()).toBe(1);
+        expect(cloned.b.c()).toBe(2);
+    });
 });

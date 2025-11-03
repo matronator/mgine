@@ -3,7 +3,8 @@
         "rootDir": ".",
         "paths": {
             "@/*": ["./src/*"],
-            "@@/*": ["./*"]
+            "@@/*": ["./*"],
+            "@/testing": ["./src/testing/*"],
         },
         "target": "ESNext",
         "useDefineForClassFields": true,
@@ -24,6 +25,6 @@
         "declarationDir": "dist",
         "listEmittedFiles": true
     },
-    "include": ["src", "dist/index.d.ts", "dist/mgine.d.ts"],
+    "include": ["src", "dist/index.d.ts", "dist/mgine.d.ts", "dist/testing/index.d.ts"],
     "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**"]
 }

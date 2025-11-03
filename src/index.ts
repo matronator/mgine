@@ -1,12 +1,15 @@
-import { Color, ColorStop, DefaultLineStyle, DefaultShadow, LineStyle, Point, Repetition, Shadow, Dimensions, Scale, TextStyle } from './properties';
+import type { Color, DrawingType, Repetition, ColorStop, LineStyle, Point, Shadow, Dimensions, Scale, TextStyle, Dash, Rectangle } from './properties';
+import { DefaultLineStyle, DefaultShadow } from './properties';
 import { Mgine } from './mgine';
 import { DrawingError, PathError } from './errors';
-import { Path, Segment, Curve, Line } from './path';
+import type { Curve, Line, BezierCurve, QuadraticCurve, SegmentType } from './path';
+import { Path, Segment } from './path';
 import { deepClone } from './utils';
 
 export default Mgine;
-export { Color, ColorStop, DefaultLineStyle, DefaultShadow, LineStyle, Point, Repetition, Shadow, Dimensions as Size, Scale, TextStyle };
-export { Path, Segment, Curve, Line };
+export type { Color, DrawingType, Repetition, ColorStop, LineStyle, Point, Shadow, Dimensions, Scale, TextStyle, Dash, Rectangle };
+export { DefaultLineStyle, DefaultShadow };
+export type { Curve, Line, BezierCurve, QuadraticCurve, SegmentType };
+export { Path, Segment };
 export { DrawingError, PathError };
-
 export { deepClone };

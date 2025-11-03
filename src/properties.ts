@@ -52,7 +52,7 @@ export interface Shadow {
     offsetY?: number;
 }
 
-export type DrawingType = 'filled' | 'outline';
+export type DrawingType = 'fill' | 'stroke';
 
 export interface ColorStop {
     color: string;
@@ -66,7 +66,3 @@ export type Repetition = 'repeat'|'repeat-x'|'repeat-y'|'no-repeat';
 export const DefaultLineStyle: LineStyle = { width: 1, cap: 'butt', join: 'miter', dash: { pattern: [] } } as const;
 
 export const DefaultShadow: Shadow = { color: 'transparent', blur: 0, offsetX: 0, offsetY: 0 } as const;
-
-export function copyPoint(point: Point): Point {
-    return { x: point.x, y: point.y };
-}

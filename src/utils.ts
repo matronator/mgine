@@ -3,6 +3,7 @@ export function deepClone<T>(obj: T): T {
     if (typeof obj !== 'object' || obj === null) return obj;
     const copy = {} as { [K in keyof T]: T[K] };
     Object.keys(obj).forEach(key => copy[key as keyof T] = deepClone((obj as { [key: string]: any })[key]));
+    Object.setPrototypeOf(copy, Object.getPrototypeOf(obj));
 
     return copy;
 }

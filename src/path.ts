@@ -1,5 +1,5 @@
 import { PathError } from "./errors";
-import { copyPoint, Point } from "./properties";
+import { Point } from "./properties";
 import { deepClone } from "./utils";
 
 export interface Line {
@@ -26,7 +26,9 @@ export interface BezierCurve {
 
 export type Curve = QuadraticCurve | BezierCurve;
 
-export type SegmentType = 'line' | 'quadratic' | 'bezier';
+export type CurveType = 'quadratic' | 'bezier';
+
+export type SegmentType = 'line' | CurveType;
 
 export class Segment {
     type: SegmentType;
@@ -100,6 +102,7 @@ export class Path {
 
     /**
      * Moves the cursor to the given position.
+     * @param coordinates The coordinates to move to.
      */
     moveTo(coordinates: Point): this {
         this.#segments.push(Segment.FromObject({ type: 'line', from: { ...this.end }, to: { ...coordinates }, drawn: false }));
@@ -109,6 +112,7 @@ export class Path {
 
     /**
      * Draws a line from the current position to the given position.
+     * @param coordinates The coordinates to draw to.
      */
     lineTo(coordinates: Point): this {
         this.#segments.push(Segment.FromObject({ type: 'line', from: { ...this.end }, to: { ...coordinates }, drawn: true }));
@@ -118,6 +122,8 @@ export class Path {
 
     /**
      * Draws a quadratic curve from the current position to the given position.
+     * @param coordinates The coordinates to draw to.
+     * @param cp The control point.
      */
     quadraticTo(coordinates: Point, cp: Point): this {
         this.#segments.push(Segment.FromObject({ type: 'quadratic', from: { ...this.end }, to: { ...coordinates }, cp1: { ...cp } }));
@@ -127,6 +133,9 @@ export class Path {
 
     /**
      * Draws a bezier curve from the current position to the given position.
+     * @param coordinates The coordinates to draw to.
+     * @param cp1 The first control point.
+     * @param cp2 The second control point.
      */
     bezierTo(coordinates: Point, cp1: Point, cp2: Point): this {
         this.#segments.push(Segment.FromObject({ type: 'bezier', from: { ...this.end }, to: { ...coordinates }, cp1: { ...cp1 }, cp2: { ...cp2 } }));
@@ -134,18 +143,80 @@ export class Path {
         return this;
     }
 
+    /**
+     * Makes the path closed
+     */
     close(): this {
         this.closed = true;
         return this;
     }
 
+    /**
+     * Makes the path open
+     */
     open(): this {
         this.closed = false;
         return this;
     }
 
+    /**
+     * Constructs the path on the given canvas context, but does not draw it yet.
+     * @param ctx The canvas context to construct the path on
+     */
+    construct(ctx: CanvasRenderingContext2D): void {
+        ctx.beginPath();
+        ctx.moveTo(this.start.x, this.start.y);
+
+        this.forEach(segment => {
+            switch (segment.type) {
+                case 'line':
+                    if (segment.drawn) {
+                        ctx.lineTo(segment.to.x, segment.to.y);
+                    } else {
+                        ctx.moveTo(segment.to.x, segment.to.y);
+                    }
+                    break;
+                case 'bezier':
+                    if (!segment.cp1 || !segment.cp2) {
+                        throw new PathError('Missing control points in bezier segment.', segment, this);
+                    }
+                    ctx.bezierCurveTo(segment.cp1.x, segment.cp1.y, segment.cp2.x, segment.cp2.y, segment.to.x, segment.to.y);
+                    break;
+                case 'quadratic':
+                    if (!segment.cp1) {
+                        throw new PathError('Missing control point in quadratic segment.', segment, this);
+                    }
+                    ctx.quadraticCurveTo(segment.cp1.x, segment.cp1.y, segment.to.x, segment.to.y);
+                    break;
+                default:
+                    throw new PathError('Unknown segment type.', segment, this);
+            }
+        });
+
+        if (this.closed) {
+            ctx.closePath();
+        }
+    }
+
     // Array functions
 
+    /**
+     * Returns the number of segments in the path.
+     */
+    get length(): number {
+        return this.#segments.length;
+    }
+
+    /**
+     * Returns a copy of the segments array in the path.
+     */
+    get segments(): Segment[] {
+        return deepClone(this.#segments);
+    }
+
+    /**
+     * Removes all segments from the path and resets the cursor to the start position.
+     */
     clear(): this {
         this.#segments = [];
         this.end = { ...this.start };
@@ -157,13 +228,6 @@ export class Path {
      */
     clone(): Path {
         return Path.FromSegments(this.closed, ...this.#segments);
-    }
-
-    /**
-     * Returns the number of segments in the path.
-     */
-    get length(): number {
-        return this.#segments.length;
     }
 
     /**
@@ -412,21 +476,21 @@ export class Path {
     /**
      * Returns an iterable of key, value pairs for every segment in the path
      */
-    entries(): ArrayIterator<[number, Segment]> {
+    entries() {
         return this.#segments.entries();
     }
 
     /**
      * Returns an iterable of keys in the path
      */
-    keys(): ArrayIterator<number> {
+    keys() {
         return this.#segments.keys();
     }
 
     /**
      * Returns an iterable of values in the path
      */
-    values(): ArrayIterator<Segment> {
+    values() {
         return this.#segments.values();
     }
 
@@ -438,7 +502,6 @@ export class Path {
         const temp = { ...path.start };
         path.start = { ...path.end };
         path.end = { ...temp };
-        // const reversed = path.#segments.toReversed();
         path.#segments = path.#segments.toReversed();
         path.map(segment => {
             const temp = { ...segment.from };
@@ -455,7 +518,7 @@ export class Path {
      */
     toSorted(compareFn?: ((a: Segment, b: Segment) => number) | undefined): Path {
         const path = this.clone();
-        path.#segments = this.#segments.toSorted(compareFn);
+        path.#segments = path.#segments.toSorted(compareFn);
         return path;
     }
 
@@ -476,7 +539,7 @@ export class Path {
     toSpliced(start: number, deleteCount: number, ...items: Segment[]): Path;
     toSpliced(start: number, deleteCount: number, ...items: Segment[]): Path {
         const path = this.clone();
-        path.#segments = this.#segments.toSpliced(start, deleteCount, ...items);
+        path.#segments = path.#segments.toSpliced(start, deleteCount, ...items);
         return path;
     }
 
@@ -488,7 +551,7 @@ export class Path {
      */
     with(index: number, value: Segment): Path {
         const path = this.clone();
-        path.#segments = this.#segments.with(index, value);
+        path.#segments = path.#segments.with(index, value);
         return path;
     }
 }

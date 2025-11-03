@@ -16,28 +16,35 @@
   "jsdelivr": "./dist/mgine.iife.js",
   "exports": {
     ".": {
-      "import": "./dist/mgine.esm.js",
       "types": "./dist/mgine.d.ts",
+      "import": "./dist/mgine.esm.js",
       "require": "./dist/mgine.cjs"
     },
     "./dist/": {
-      "import": "./dist/",
       "types": "./dist/",
+      "import": "./dist/",
       "require": "./dist/"
-    }
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.esm.js",
+      "require": "./dist/testing.cjs"
+    },
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "vite --host",
     "prebuild": "rm -rf dist/*",
-    "build": "tsc && vite build",
+    "build": "npm run build:main && npm run build:testing",
+    "build:testing": "tsc && LIB_NAME=testing vite build",
+    "build:main": "tsc && LIB_NAME=mgine vite build",
     "postbuild": "dts-bundle-generator --config ./dts-bundle-generator.config.ts",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "format": "prettier . --write",
     "upgrade": "upgradeps",
     "release": "npm run build && np",
-    "version": "auto-changelog -p && git add CHANGELOG.md",
-    "test:browser": "vitest --config=vitest.browser.config.ts"
+    "version": "auto-changelog -p && git add CHANGELOG.md"
   },
   "bugs": {
     "url": "https://github.com/matronator/mgine/issues"
@@ -81,8 +88,11 @@
   "type": "module",
   "typesVersions": {
     "*": {
-      "*": [
+      "mgine": [
         "./dist/mgine.d.ts"
+      ],
+      "testing": [
+        "./dist/testing/index.d.ts"
       ]
     }
   },

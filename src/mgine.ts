@@ -1,5 +1,5 @@
-import { PathError } from "./errors";
-import { Path } from "./path";
+import { DrawingError } from "./errors";
+import { CurveType, Path } from "./path";
 import { Point, Scale, Dimensions, LineStyle, DefaultLineStyle, Shadow, DefaultShadow, ColorStop, Color, Repetition, TextStyle, DrawingType, Rectangle } from "./properties";
 
 export interface MgineOptions {
@@ -12,6 +12,7 @@ export interface MgineOptions {
 export class Mgine {
     #canvas: HTMLCanvasElement;
     #ctx: CanvasRenderingContext2D;
+    #options: MgineOptions;
 
     static DefaultFontFamily: string = 'Arial';
 
@@ -19,6 +20,7 @@ export class Mgine {
         const { canvas, ctx } = this.#init(id, options);
         this.#canvas = canvas;
         this.#ctx = ctx;
+        this.#options = options ?? {};
     }
 
     #init(id: string, options?: MgineOptions): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
@@ -84,6 +86,10 @@ export class Mgine {
         return this.#ctx;
     }
 
+    get options(): MgineOptions {
+        return this.#options;
+    }
+
     setLineStyle(lineStyle: LineStyle = DefaultLineStyle) {
         this.#ctx.lineWidth = lineStyle.width;
         this.#ctx.lineCap = lineStyle.cap ?? 'butt';
@@ -106,6 +112,10 @@ export class Mgine {
 
     clear() {
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+    }
+
+    clearRect(rect: Rectangle) {
+        this.#ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
     }
 
     save() {
@@ -169,115 +179,23 @@ export class Mgine {
         this.#ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
-    rect(rect: Rectangle, style: Color, type: DrawingType = 'filled', lineStyle?: LineStyle) {
-        if (type === 'filled') {
-            this.fillRect(rect, style);
-        } else if (type === 'outline') {
-            this.strokeRect(rect, style, lineStyle ?? DefaultLineStyle);
+    rect(rect: Rectangle, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        if (type === 'fill') {
+            this.fillRect(rect, color);
+        } else if (type === 'stroke') {
+            this.strokeRect(rect, color, lineStyle);
         }
     }
 
-    clearRect(coordinates: Point, size: Dimensions) {
-        this.#ctx.clearRect(coordinates.x, coordinates.y, size.width, size.height);
-    }
-
-    #drawLinearPath(points: Point[], closePath: boolean = false) {
-        this.#ctx.beginPath();
-        this.#ctx.moveTo(points[0].x, points[0].y);
-
-        for (let i = 1; i < points.length; i++) {
-            this.#ctx.lineTo(points[i].x, points[i].y);
-        }
-
-        if (closePath) {
-            this.#ctx.closePath();
-        }
-    }
-
-    strokeLinearPath(points: Point[], strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle, closePath: boolean = false) {
-        if (points.length === 0) return;
-
-        this.#ctx.strokeStyle = strokeStyle;
-        this.setLineStyle(lineStyle);
-
-        this.#drawLinearPath(points, closePath);
-        this.#ctx.stroke();
-    }
-
-    fillLinearPath(points: Point[], fillStyle: Color, closePath: boolean = false) {
-        if (points.length === 0) return;
-
-        this.#ctx.fillStyle = fillStyle;
-
-        this.#drawLinearPath(points, closePath);
-        this.#ctx.fill();
-    }
-
-    linearPath(points: Point[], style: Color, closePath: boolean = false, type: DrawingType = 'filled', lineStyle?: LineStyle) {
-        if (type === 'filled') {
-            this.fillLinearPath(points, style, closePath);
-        } else if (type === 'outline') {
-            this.strokeLinearPath(points, style, lineStyle ?? DefaultLineStyle, closePath);
-        }
-    }
-
-    polygon(points: Point[], style: Color, type: DrawingType = 'filled', lineStyle?: LineStyle) {
-        this.linearPath(points, style, true, type, lineStyle);
-    }
-
-    createPath(startingPoint: Point): Path {
-        return new Path(startingPoint);
-    }
-
-    #drawPath(path: Path) {
-        this.#ctx.beginPath();
-        this.#ctx.moveTo(path.start.x, path.start.y);
-
-        path.forEach(segment => {
-            switch (segment.type) {
-                case 'line':
-                    if (segment.drawn) {
-                        this.#ctx.lineTo(segment.to.x, segment.to.y);
-                    } else {
-                        this.#ctx.moveTo(segment.to.x, segment.to.y);
-                    }
-                    break;
-                case 'bezier':
-                    if (!segment.cp1 || !segment.cp2) {
-                        throw new PathError('Missing control points in bezier segment.', segment, path);
-                    }
-                    this.#ctx.bezierCurveTo(segment.cp1.x, segment.cp1.y, segment.cp2.x, segment.cp2.y, segment.to.x, segment.to.y);
-                    break;
-                case 'quadratic':
-                    if (!segment.cp1) {
-                        throw new PathError('Missing control point in quadratic segment.', segment, path);
-                    }
-                    this.#ctx.quadraticCurveTo(segment.cp1.x, segment.cp1.y, segment.to.x, segment.to.y);
-                    break;
-                default:
-                    throw new PathError('Unknown segment type.', segment, path);
-            }
-        });
-    }
-
-    fillPath(path: Path, fillStyle: Color) {
-        this.#ctx.fillStyle = fillStyle;
-        this.#drawPath(path);
-        this.#ctx.fill();
-    }
-
-    strokePath(path: Path, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
-        this.#ctx.strokeStyle = strokeStyle;
-        this.setLineStyle(lineStyle);
-        this.#drawPath(path);
-        this.#ctx.stroke();
-    }
-
-    path(path: Path, style: Color, type: DrawingType = 'outline', lineStyle?: LineStyle) {
-        if (type === 'filled') {
-            this.fillPath(path, style);
-        } else if (type === 'outline') {
-            this.strokePath(path, style, lineStyle ?? DefaultLineStyle);
+    polygon(points: Point[], color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        this.pointsToPath(points);
+        if (type === 'fill') {
+            this.#ctx.fillStyle = color;
+            this.#ctx.fill();
+        } else if (type === 'stroke') {
+            this.#ctx.strokeStyle = color;
+            this.setLineStyle(lineStyle);
+            this.#ctx.stroke();
         }
     }
 
@@ -296,13 +214,125 @@ export class Mgine {
         this.#ctx.stroke();
     }
 
-    circle(center: Point, radius: number, style: Color, drawingType: DrawingType = 'filled', lineStyle?: LineStyle) {
-        if (drawingType === 'filled') {
-            this.fillCircle(center, radius, style);
-        } else if (drawingType === 'outline') {
-            this.strokeCircle(center, radius, style, lineStyle ?? DefaultLineStyle);
+    circle(center: Point, radius: number, color: Color, drawingType: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        if (drawingType === 'fill') {
+            this.fillCircle(center, radius, color);
+        } else if (drawingType === 'stroke') {
+            this.strokeCircle(center, radius, color, lineStyle);
         }
     }
+
+    ellipse(center: Point, radius: Point, rotation: number = 0, startAngle: number = 0, endAngle: number = Math.PI * 2, counterClockwise: boolean = false, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.beginPath();
+        this.#ctx.ellipse(center.x, center.y, radius.x, radius.y, rotation, startAngle, endAngle, counterClockwise);
+        if (type === 'fill') {
+            this.#ctx.fillStyle = color;
+            this.#ctx.fill();
+        } else if (type === 'stroke') {
+            this.#ctx.strokeStyle = color;
+            this.setLineStyle(lineStyle);
+            this.#ctx.stroke();
+        }
+    }
+
+    // Paths
+
+    pointsToPath(points: Point[], closed: boolean = false): Path {
+        if (points.length === 0) {
+            throw new DrawingError('No points provided');
+        }
+        const path = this.createPath(points[0]);
+        points.shift();
+        points.forEach(point => path.lineTo(point));
+        if (closed) path.close();
+        path.construct(this.#ctx);
+        return path;
+    }
+
+    line(from: Point, to: Point, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.beginPath();
+        this.#ctx.moveTo(from.x, from.y);
+        this.#ctx.lineTo(to.x, to.y);
+        this.#ctx.strokeStyle = strokeStyle;
+        this.setLineStyle(lineStyle);
+        this.#ctx.stroke();
+    }
+
+    bezierCurve(from: Point, control1: Point, control2: Point, to: Point, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.beginPath();
+        this.#ctx.moveTo(from.x, from.y);
+        this.#ctx.bezierCurveTo(control1.x, control1.y, control2.x, control2.y, to.x, to.y);
+        this.#ctx.strokeStyle = strokeStyle;
+        this.setLineStyle(lineStyle);
+        this.#ctx.stroke();
+    }
+
+    quadraticCurve(from: Point, control: Point, to: Point, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.beginPath();
+        this.#ctx.moveTo(from.x, from.y);
+        this.#ctx.quadraticCurveTo(control.x, control.y, to.x, to.y);
+        this.#ctx.strokeStyle = strokeStyle;
+        this.setLineStyle(lineStyle);
+        this.#ctx.stroke();
+    }
+
+    curve(from: Point, to: Point, strokeStyle: Color, type: CurveType, lineStyle: LineStyle = DefaultLineStyle, control1: Point, control2?: Point) {
+        if (type === 'quadratic') {
+            this.quadraticCurve(from, control1, to, strokeStyle, lineStyle);
+        } else if (type === 'bezier') {
+            if (!control2) {
+                throw new DrawingError('Bezier curve requires two control points');
+            }
+            this.bezierCurve(from, control1, control2, to, strokeStyle, lineStyle);
+        }
+    }
+
+    linearPath(points: Point[], strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.strokeStyle = strokeStyle;
+        this.setLineStyle(lineStyle);
+        this.pointsToPath(points);
+        this.#ctx.stroke();
+    }
+
+    createPath(startingPoint: Point): Path {
+        return new Path(startingPoint);
+    }
+
+    fillPath(path: Path, fillStyle: Color) {
+        this.#ctx.fillStyle = fillStyle;
+        path.construct(this.#ctx);
+        this.#ctx.fill();
+    }
+
+    strokePath(path: Path, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.strokeStyle = strokeStyle;
+        this.setLineStyle(lineStyle);
+        path.construct(this.#ctx);
+        this.#ctx.stroke();
+    }
+
+    path(path: Path, color: Color, type: DrawingType = 'stroke', lineStyle: LineStyle = DefaultLineStyle) {
+        if (type === 'fill') {
+            this.fillPath(path, color);
+        } else if (type === 'stroke') {
+            this.strokePath(path, color, lineStyle);
+        }
+    }
+
+    arc(center: Point, radius: number, startAngle: number, endAngle: number, counterClockwise: boolean = false, style: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        this.#ctx.beginPath();
+        this.#ctx.arc(center.x, center.y, radius, startAngle, endAngle, counterClockwise);
+        if (type === 'fill') {
+            this.#ctx.fillStyle = style;
+            this.#ctx.fill();
+        } else if (type === 'stroke') {
+            this.#ctx.strokeStyle = style;
+            this.setLineStyle(lineStyle);
+            this.#ctx.stroke();
+        }
+    }
+
+    // Progress Bars
 
     progressBar(rect: Rectangle, progress: number, showText: boolean = false, backgroundColor: Color = 'lightgray', progressColor: Color = 'green', textColor: Color = 'white', borderColor?: Color, borderWidth: number = 1): void {
         // Draw background
@@ -358,6 +388,8 @@ export class Mgine {
         }
     }
 
+    // Images
+
     drawImage(img: HTMLImageElement, coordinates: Point, scale?: Scale): void;
     drawImage(img: HTMLImageElement, coordinates: Point, size?: Dimensions): void;
     drawImage(img: HTMLImageElement, coordinates: Point, sizeOrScale?: Dimensions|Scale): void {
@@ -374,6 +406,8 @@ export class Mgine {
             this.#ctx.drawImage(img, coordinates.x, coordinates.y);
         }
     }
+
+    // Text
 
     fillText(text: string, coordinates: Point, style: TextStyle, maxWidth?: number) {
         this.setTextStyle(style);
