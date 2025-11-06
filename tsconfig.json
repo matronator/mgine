@@ -26,5 +26,5 @@
         "listEmittedFiles": true
     },
     "include": ["src", "dist/index.d.ts", "dist/mgine.d.ts", "dist/testing/index.d.ts"],
-    "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**"]
+    "exclude": ["**/*.test.ts", "node_modules", "test/**", ".history/**", "dist/**"]
 }
