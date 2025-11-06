@@ -7,6 +7,7 @@ export interface MgineOptions {
     fillAvailableSpace?: boolean;
     width?: number;
     height?: number;
+    transparentBackground?: boolean;
 }
 
 export class Mgine {
@@ -47,7 +48,12 @@ export class Mgine {
             }
         }
 
-        const ctx = canvas.getContext('2d');
+        const opts: CanvasRenderingContext2DSettings = {};
+        if (options?.transparentBackground !== undefined) {
+            opts.alpha = options.transparentBackground;
+        }
+
+        const ctx = canvas.getContext('2d', opts);
 
         if (!ctx) {
             throw new Error('Could not get canvas context');
@@ -110,8 +116,18 @@ export class Mgine {
         if (textStyle.wordSpacing) this.#ctx.wordSpacing = textStyle.wordSpacing;
     }
 
-    clear() {
+    clear(keepTransform: boolean = false) {
+        if (keepTransform) this.save();
+        this.#ctx.setTransform(1, 0, 0, 1, 0, 0);
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+        if (keepTransform) this.restore();
+    }
+
+    reset() {
+        this.#ctx.reset();
+        if (this.#options?.pixelArt) {
+            this.#ctx.imageSmoothingEnabled = false;
+        }
     }
 
     clearRect(rect: Rectangle) {
@@ -222,7 +238,7 @@ export class Mgine {
         }
     }
 
-    ellipse(center: Point, radius: Point, rotation: number = 0, startAngle: number = 0, endAngle: number = Math.PI * 2, counterClockwise: boolean = false, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+    partialEllipse(center: Point, radius: Point, rotation: number = 0, startAngle: number = 0, endAngle: number = Math.PI * 2, counterClockwise: boolean = false, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
         this.#ctx.beginPath();
         this.#ctx.ellipse(center.x, center.y, radius.x, radius.y, rotation, startAngle, endAngle, counterClockwise);
         if (type === 'fill') {
@@ -233,6 +249,16 @@ export class Mgine {
             this.setLineStyle(lineStyle);
             this.#ctx.stroke();
         }
+    }
+
+    ellipse(xy1: Point, xy2: Point, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        const center: Point = { x: (xy1.x + xy2.x) / 2, y: (xy1.y + xy2.y) / 2 };
+        const radius: Point = { x: Math.abs(xy2.x - xy1.x) / 2, y: Math.abs(xy2.y - xy1.y) / 2 };
+        this.partialEllipse(center, radius, 0, 0, Math.PI * 2, false, color, type, lineStyle);
+    }
+
+    ellipseFromCenter(center: Point, radius: Point, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+        this.partialEllipse(center, radius, 0, 0, Math.PI * 2, false, color, type, lineStyle);
     }
 
     // Paths
