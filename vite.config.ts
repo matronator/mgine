@@ -49,8 +49,8 @@ const rollupInputs = {
     }
 }
 
-const currentConfig = config[process.env.LIB_NAME ?? ''];
-const currentInput = rollupInputs[process.env.LIB_NAME ?? ''];
+const currentConfig = config[process.env.LIB_NAME ?? 'mgine'];
+const currentInput = rollupInputs[process.env.LIB_NAME ?? 'mgine'];
 
 if (currentConfig === undefined || currentInput === undefined) {
   throw new Error('LIB_NAME is not defined or is not valid');
