@@ -12,6 +12,9 @@ const config = {
             filePath: "./src/testing/index.ts",
             outFile: "./dist/testing.d.ts",
             noCheck: false,
+            output: {
+                exportReferencedTypes: false,
+            },
         },
     ],
 };

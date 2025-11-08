@@ -11,24 +11,30 @@
     "url": "git+https://github.com/matronator/mgine.git"
   },
   "types": "./dist/mgine.d.ts",
-  "main": "./dist/mgine.cjs",
+  "main": "./dist/mgine.esm.js",
   "module": "./dist/mgine.esm.js",
   "jsdelivr": "./dist/mgine.iife.js",
+  "unpkg": "./dist/mgine.iife.js",
   "exports": {
     ".": {
-      "types": "./dist/mgine.d.ts",
-      "import": "./dist/mgine.esm.js",
-      "require": "./dist/mgine.cjs"
-    },
-    "./dist/": {
-      "types": "./dist/",
-      "import": "./dist/",
-      "require": "./dist/"
+      "import": {
+        "types": "./dist/mgine.d.ts",
+        "default": "./dist/mgine.esm.js"
+      },
+      "require": {
+        "types": "./dist/mgine.d.cts",
+        "default": "./dist/mgine.cjs"
+      }
     },
     "./testing": {
-      "types": "./dist/testing.d.ts",
-      "import": "./dist/testing.esm.js",
-      "require": "./dist/testing.cjs"
+      "import": {
+        "types": "./dist/testing.d.ts",
+        "default": "./dist/testing.esm.js"
+      },
+      "require": {
+        "types": "./dist/testing.d.cts",
+        "default": "./dist/testing.cjs"
+      }
     },
     "./package.json": "./package.json"
   },
@@ -38,7 +44,7 @@
     "build": "npm run build:main && npm run build:testing",
     "build:testing": "tsc && LIB_NAME=testing vite build",
     "build:main": "tsc && LIB_NAME=mgine vite build",
-    "postbuild": "dts-bundle-generator --config ./dts-bundle-generator.config.ts",
+    "postbuild": "dts-bundle-generator --config ./dts-bundle-generator.config.ts && cp dist/mgine.d.ts dist/mgine.d.cts && cp dist/testing.d.ts dist/testing.d.cts",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "format": "prettier . --write",

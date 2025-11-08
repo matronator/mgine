@@ -1,18 +1,5 @@
 import path from 'path';
 import { defineConfig } from 'vite';
-import packageJson from './package.json';
-
-const getPackageName = () => {
-    return packageJson.name;
-};
-
-const getPackageNameCamelCase = () => {
-    try {
-        return getPackageName().replace(/-./g, char => char[1].toUpperCase());
-    } catch (err) {
-        throw new Error("Name property in package.json is missing.");
-    }
-};
 
 const fileName = {
     "mgine/testing": {
@@ -21,9 +8,9 @@ const fileName = {
         iife: `testing.iife.js`,
     },
     mgine: {
-        es: `${getPackageName()}.esm.js`,
-        cjs: `${getPackageName()}.cjs`,
-        iife: `${getPackageName()}.iife.js`,
+        es: `mgine.esm.js`,
+        cjs: `mgine.cjs`,
+        iife: `mgine.iife.js`,
     },
 };
 
@@ -31,12 +18,12 @@ const config = {
   mgine: {
     entry: path.resolve(__dirname, "src/index.ts"),
     name: 'Mgine',
-    fileName: (format, entryName) => fileName[entryName][format],
+    fileName: (format: string, entryName: string) => fileName[entryName][format],
   },
   testing: {
     entry: path.resolve(__dirname, "src/testing/index.ts"),
     name: 'MgineTesting',
-    fileName: (format, entryName) => fileName[entryName][format],
+    fileName: (format: string, entryName: string) => fileName[entryName][format],
   },
 };
 
@@ -77,6 +64,7 @@ export default defineConfig({
                 exports: 'named',
                 compact: true,
                 esModule: true,
+                preserveModules: false,
             },
             input: currentInput,
         }
