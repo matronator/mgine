@@ -98,7 +98,7 @@
         "./dist/mgine.d.ts"
       ],
       "testing": [
-        "./dist/testing/index.d.ts"
+        "./dist/testing.d.ts"
       ]
     }
   },
