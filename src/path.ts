@@ -144,6 +144,63 @@ export class Path {
     }
 
     /**
+     * Draws a curve from the current position to the given position.
+     * @param coordinates The coordinates to draw to.
+     * @param cp The control point.
+     */
+    curveTo(coordinates: Point, cp: Point): this;
+    /**
+     * Draws a curve from the current position to the given position.
+     * @param coordinates The coordinates to draw to.
+     * @param cp1 The first control point.
+     * @param cp2 The second control point.
+     */
+    curveTo(coordinates: Point, cp1: Point, cp2: Point): this;
+    curveTo(coordinates: Point, cp1: Point, cp2?: Point): this {
+        if (cp2) {
+            return this.bezierTo(coordinates, cp1, cp2);
+        } else {
+            return this.quadraticTo(coordinates, cp1);
+        }
+    }
+
+    /**
+     * Draws a segment from the current position to the given position. Segment type is determined by the number of control points (0 for straight line).
+     * @param coordinates The coordinates to draw to.
+     */
+    segmentTo(coordinates: Point): this;
+    /**
+     * Draws a segment from the current position to the given position. Segment type is determined by the number of control points (1 for quadratic curve).
+     * @param coordinates The coordinates to draw to.
+     * @param cp The control point
+     */
+    segmentTo(coordinates: Point, cp: Point): this;
+    /**
+     * Draws a segment from the current position to the given position. Segment type is determined by the number of control points (2 for bezier curve).
+     * @param coordinates The coordinates to draw to.
+     * @param cp1 First control point
+     * @param cp2 Second control point
+     */
+    segmentTo(coordinates: Point, cp1: Point, cp2: Point): this;
+    /**
+     * Draws a segment from the current position to the given position. Segment type is determined by the number of control points (2 for bezier curve, 1 for quadratic curve, 0 for straight line).
+     * @param coordinates The coordinates to draw to.
+     * @param cp1 First control point
+     * @param cp2 Second control point
+     */
+    segmentTo(coordinates: Point, cp1?: Point, cp2?: Point): this {
+        if (cp1 && cp2) {
+            return this.bezierTo(coordinates, cp1, cp2);
+        } else if (cp1) {
+            return this.quadraticTo(coordinates, cp1!);
+        } else if (!cp1 && !cp2) {
+            return this.lineTo(coordinates);
+        } else {
+            throw new PathError('Cannot specify second control point if first control point is not specified.');
+        }
+    }
+
+    /**
      * Makes the path closed
      */
     close(): this {
@@ -163,8 +220,16 @@ export class Path {
      * Constructs the path on the given canvas context, but does not draw it yet.
      * @param ctx The canvas context to construct the path on
      */
-    construct(ctx: CanvasRenderingContext2D): void {
-        ctx.beginPath();
+    construct(ctx: CanvasRenderingContext2D): void;
+    /**
+     * Constructs the path and returns it as a Path2D object.
+     * @param path The Path2D object to construct the path on
+     */
+    construct(path: Path2D): Path2D;
+    construct(ctx: CanvasRenderingContext2D|Path2D): Path2D|void {
+        if (ctx instanceof CanvasRenderingContext2D) {
+            ctx.beginPath();
+        }
         ctx.moveTo(this.start.x, this.start.y);
 
         this.forEach(segment => {
@@ -195,6 +260,10 @@ export class Path {
 
         if (this.closed) {
             ctx.closePath();
+        }
+
+        if (ctx instanceof Path2D) {
+            return ctx;
         }
     }
 

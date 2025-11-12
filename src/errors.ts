@@ -1,3 +1,4 @@
+import { GradientProps } from "./gradient";
 import { Path, Segment } from "./path";
 
 export class PathError extends Error {
@@ -30,5 +31,24 @@ export class DrawingError extends Error {
     constructor(message?: string) {
         super(message);
         this.name = 'DrawingError';
+    }
+}
+
+export class GradientError extends Error {
+    props?: GradientProps;
+
+    constructor(message?: string, props?: GradientProps) {
+        if (props) {
+            if (!message) {
+                message = '';
+            } else {
+                message += ': ';
+            }
+
+            message += `Provided properties: ${Object.keys(props).join(', ')}`;
+        }
+        super(message);
+        this.name = 'GradientError';
+        this.props = props;
     }
 }
