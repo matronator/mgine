@@ -1,7 +1,7 @@
 import { DrawingError } from "./errors";
 import { Mgine } from "./mgine";
 import { Path } from "./path";
-import { Color, DefaultLineStyle, DefaultShadow, Dimensions, DrawingType, LineStyle, Point, Rectangle, Scale, Shadow, TextStyle } from "./properties";
+import { Color, DefaultLineStyle, DefaultShadow, Dimensions, DrawingType, LineStyle, Point, Rectangle, Repetition, Scale, Shadow, TextStyle } from "./properties";
 import { isString } from "./utils";
 
 export class Graphics {
@@ -47,6 +47,21 @@ export class Graphics {
         this.#ctx.shadowOffsetY = shadow.offsetY ?? 0;
     }
 
+    save() {
+        this.#ctx.save();
+    }
+
+    restore() {
+        this.#ctx.restore();
+    }
+
+    clear(keepTransform: boolean = false) {
+        if (keepTransform) this.save();
+        this.#ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.#ctx.clearRect(0, 0, this.#ctx.canvas.width, this.#ctx.canvas.height);
+        if (keepTransform) this.restore();
+    }
+
     clearRect(rect: Rectangle) {
         this.#ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
     }
@@ -61,6 +76,12 @@ export class Graphics {
         if (closed) path.close();
         path.construct(this.#ctx);
         return path;
+    }
+
+    // Patterns
+
+    pattern(image: HTMLImageElement, repetition: Repetition = 'repeat'): CanvasPattern|null {
+        return this.#ctx.createPattern(image, repetition);
     }
 
     // Shapes

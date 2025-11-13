@@ -140,7 +140,7 @@ export class LinearGradient extends AbstractGradient {
         this.style = this.create(this.#from, this.#to, this.colorStops);
     }
 
-    removeColorStop(offset: number) {
+    override removeColorStop(offset: number) {
         super.removeColorStop(offset);
         this.style = this.create(this.#from, this.#to, this.colorStops);
     }
@@ -191,12 +191,12 @@ export class RadialGradient extends AbstractGradient {
         this.style = this.create(this.#from, this.#fromRadius, this.#to, toRadius, this.colorStops);
     }
 
-    addColorStop(offset: number, color: string): void {
+    override addColorStop(offset: number, color: string): void {
         super.addColorStop(offset, color);
         this.style = this.create(this.#from, this.#fromRadius, this.#to, this.#toRadius, this.colorStops);
     }
 
-    removeColorStop(offset: number) {
+    override removeColorStop(offset: number) {
         super.removeColorStop(offset);
         this.style = this.create(this.#from, this.#fromRadius, this.#to, this.#toRadius, this.colorStops);
     }
@@ -231,12 +231,12 @@ export class ConicGradient extends AbstractGradient {
         this.style = this.create(this.#startAngle, center, this.colorStops);
     }
 
-    addColorStop(offset: number, color: string): void {
+    override addColorStop(offset: number, color: string): void {
         super.addColorStop(offset, color);
         this.style = this.create(this.#startAngle, this.#center, this.colorStops);
     }
 
-    removeColorStop(offset: number) {
+    override removeColorStop(offset: number) {
         super.removeColorStop(offset);
         this.style = this.create(this.#startAngle, this.#center, this.colorStops);
     }

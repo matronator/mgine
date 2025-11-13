@@ -113,10 +113,7 @@ export class Mgine {
     }
 
     clear(keepTransform: boolean = false) {
-        if (keepTransform) this.save();
-        this.#ctx.setTransform(1, 0, 0, 1, 0, 0);
-        this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
-        if (keepTransform) this.restore();
+        return this.#graphics.clear(keepTransform);
     }
 
     reset() {
@@ -128,14 +125,6 @@ export class Mgine {
 
     clearRect(rect: Rectangle) {
         this.#graphics.clearRect(rect);
-    }
-
-    save() {
-        this.#ctx.save();
-    }
-
-    restore() {
-        this.#ctx.restore();
     }
 
     // Gradients
@@ -155,7 +144,7 @@ export class Mgine {
     // Patterns
 
     pattern(image: HTMLImageElement, repetition: Repetition = 'repeat'): CanvasPattern|null {
-        return this.#ctx.createPattern(image, repetition);
+        return this.#graphics.pattern(image, repetition);
     }
 
     // Shapes
