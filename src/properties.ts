@@ -3,7 +3,7 @@ export interface Point {
     y: number;
 }
 
-export interface Rectangle {
+export interface Rect {
     x: number;
     y: number;
     width: number;

@@ -1,7 +1,7 @@
 import { DrawingError } from "./errors";
 import { Mgine } from "./mgine";
 import { Path } from "./path";
-import { Color, DefaultLineStyle, DefaultShadow, Dimensions, DrawingType, LineStyle, Point, Rectangle, Repetition, Scale, Shadow, TextStyle } from "./properties";
+import { Color, DefaultLineStyle, DefaultShadow, Dimensions, DrawingType, LineStyle, Point, Rect, Repetition, Scale, Shadow, TextStyle } from "./properties";
 import { isString } from "./utils";
 
 export class Graphics {
@@ -62,7 +62,7 @@ export class Graphics {
         if (keepTransform) this.restore();
     }
 
-    clearRect(rect: Rectangle) {
+    clearRect(rect: Rect) {
         this.#ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
     }
 
@@ -86,18 +86,18 @@ export class Graphics {
 
     // Shapes
 
-    fillRect(rect: Rectangle, fillStyle: Color) {
+    fillRect(rect: Rect, fillStyle: Color) {
         this.#ctx.fillStyle = fillStyle;
         this.#ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     }
 
-    strokeRect(rect: Rectangle, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
+    strokeRect(rect: Rect, strokeStyle: Color, lineStyle: LineStyle = DefaultLineStyle) {
         this.#ctx.strokeStyle = strokeStyle;
         this.setLineStyle(lineStyle);
         this.#ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
 
-    rect(rect: Rectangle, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
+    rect(rect: Rect, color: Color, type: DrawingType = 'fill', lineStyle: LineStyle = DefaultLineStyle) {
         if (type === 'fill') {
             this.fillRect(rect, color);
         } else if (type === 'stroke') {
@@ -243,7 +243,7 @@ export class Graphics {
 
     // Progress Bars
 
-    progressBar(rect: Rectangle, progress: number, showText: boolean = false, backgroundColor: Color = 'lightgray', progressColor: Color = 'green', textColor: Color = 'white', borderColor?: Color, borderWidth: number = 1): void {
+    progressBar(rect: Rect, progress: number, showText: boolean = false, backgroundColor: Color = 'lightgray', progressColor: Color = 'green', textColor: Color = 'white', borderColor?: Color, borderWidth: number = 1): void {
         // Draw background
         this.fillRect(rect, backgroundColor);
 
