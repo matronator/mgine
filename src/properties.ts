@@ -3,7 +3,7 @@ export interface Point {
     y: number;
 }
 
-export interface Rectangle {
+export interface Rect {
     x: number;
     y: number;
     width: number;
@@ -21,7 +21,7 @@ export interface Scale {
 }
 
 export interface TextStyle {
-    font: string;
+    font?: string;
     textAlign?: CanvasTextAlign;
     textBaseline?: CanvasTextBaseline;
     color?: Color;
@@ -62,6 +62,10 @@ export interface ColorStop {
 export type Color = string|CanvasGradient|CanvasPattern;
 
 export type Repetition = 'repeat'|'repeat-x'|'repeat-y'|'no-repeat';
+
+export type Origin = 'center' | 'top-left' | 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left';
+
+export type GradientType = 'linear' | 'radial' | 'conic';
 
 export const DefaultLineStyle: LineStyle = { width: 1, cap: 'butt', join: 'miter', dash: { pattern: [] } } as const;
 
