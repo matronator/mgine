@@ -33,7 +33,7 @@ export class MgineTesting {
     }
 
     clear() {
-        this.mgine.clear();
+        this.mgine.graphics.clear();
         this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 }
