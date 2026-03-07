@@ -1,5 +1,6 @@
 import { assert, assertType, describe, it, onTestFailed, vi } from "vitest";
 import Mgine, { Path, Segment } from "../../src";
+import { Graphics } from "../../src/graphics";
 
 global.jest = vi;
 
@@ -13,14 +14,12 @@ describe('Paths', () => {
     }
 
     it('should create new Path', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 });
+        const path = Mgine.CreatePath({ x: 0, y: 0 });
         assert.instanceOf(path, Path);
     });
 
     it('should create new Path with segments', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 });
+        const path = Mgine.CreatePath({ x: 0, y: 0 });
         path.lineTo({ x: 10, y: 10 });
         path.quadraticTo({ x: 20, y: 20 }, { x: 30, y: 30 });
         path.bezierTo({ x: 40, y: 40 }, { x: 50, y: 50 }, { x: 60, y: 60 });
@@ -28,8 +27,7 @@ describe('Paths', () => {
     });
 
     it('should do something for each segment', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 })
+        const path = Mgine.CreatePath({ x: 0, y: 0 })
             .lineTo({ x: 10, y: 10 })
             .quadraticTo({ x: 20, y: 20 }, { x: 30, y: 30 })
             .bezierTo({ x: 40, y: 40 }, { x: 50, y: 50 }, { x: 60, y: 60 })
@@ -62,8 +60,7 @@ describe('Paths', () => {
     });
 
     it('should push to segments without modifying them', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 });
+        const path = Mgine.CreatePath({ x: 0, y: 0 });
         for (let i = 0; i < 5; i++) {
             const segment = new Segment('line', { x: i * 10, y: i * 10 }, { x: (i+1)*10, y: (i+1)*10 });
             path.push(segment);
@@ -74,8 +71,7 @@ describe('Paths', () => {
     });
 
     it('should reverse path segments - path.reverse()', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 })
+        const path = Mgine.CreatePath({ x: 0, y: 0 })
             .lineTo({ x: 10, y: 10 })
             .quadraticTo({ x: 20, y: 20 }, { x: 30, y: 30 })
             .bezierTo({ x: 40, y: 40 }, { x: 50, y: 50 }, { x: 60, y: 60 });
@@ -98,8 +94,7 @@ describe('Paths', () => {
     });
 
     it('should create a reversed copy of the path - path.toReversed()', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 })
+        const path = Mgine.CreatePath({ x: 0, y: 0 })
             .lineTo({ x: 10, y: 10 })
             .quadraticTo({ x: 20, y: 20 }, { x: 30, y: 30 })
             .bezierTo({ x: 40, y: 40 }, { x: 50, y: 50 }, { x: 60, y: 60 });
@@ -128,8 +123,7 @@ describe('Paths', () => {
     });
 
     it('should be impossible to modify the array we get from path.segments', () => {
-        const mgine = initMgine();
-        const path = mgine.createPath({ x: 0, y: 0 });
+        const path = Mgine.CreatePath({ x: 0, y: 0 });
         path.lineTo({ x: 10, y: 10 });
         path.bezierTo({ x: 20, y: 20 }, { x: 30, y: 30 }, { x: 40, y: 40 });
         const segments = path.segments;
